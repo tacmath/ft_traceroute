@@ -1,9 +1,9 @@
-NAME = project
+NAME = ft_traceroute
 SRCDIR = srcs/
 INCDIR = include/
 SRCFILES = main.c\
 
-INCFILES = project.h
+INCFILES = ft_traceroute.h
 SRC = $(addprefix $(SRCDIR),$(SRCFILES))
 INC = $(addprefix $(INCDIR),$(INCFILES))
 OBJ = $(SRC:.c=.o)
