@@ -2,12 +2,15 @@ NAME = ft_traceroute
 SRCDIR = srcs/
 INCDIR = include/
 SRCFILES = main.c\
+			header.c\
+			print.c\
+			utils.c\
 
 INCFILES = ft_traceroute.h
 SRC = $(addprefix $(SRCDIR),$(SRCFILES))
 INC = $(addprefix $(INCDIR),$(INCFILES))
 OBJ = $(SRC:.c=.o)
-FLAG = -Wall -Werror -Wextra -I include
+FLAG = -Wall -Wextra -I include
 
 all: $(NAME)
 
