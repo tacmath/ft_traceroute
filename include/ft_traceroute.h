@@ -29,6 +29,7 @@ struct packet_info {
 	struct packet	recieved;
 	struct timeval  start;
 	struct timeval  end;
+	int				error;
 };
 
 
@@ -61,7 +62,7 @@ char* strIcmpType(uint8_t type);
 
 // print.c
 void printAddrInfo(struct addrinfo *info);
-void printPacket(struct packet *packet, float delatTime);
+void printHop(hop_t *hop);
 void printUsage();
 
 // header.c

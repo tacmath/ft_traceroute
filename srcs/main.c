@@ -7,10 +7,9 @@ void stop_loop(int sig) {
     traceroute_runnig = 0;
 }
 
-int create_socket(unsigned int timeoutSec) {
+int create_socket(struct timeval timeout) {
     int sockId;
     int option;
-    struct timeval timeout;      
 
 
     if ((sockId = socket(PF_INET, SOCK_RAW, IPPROTO_ICMP)) < 0) {
@@ -26,8 +25,6 @@ int create_socket(unsigned int timeoutSec) {
     }
 
 	// setting timeout of recv setting
-    timeout.tv_sec = timeoutSec;
-    timeout.tv_usec = 0;
     if (setsockopt(sockId, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout))) {
         dprintf(2, "ft_traceroute: Failed to set socket option\n");
         return 0;
@@ -42,13 +39,17 @@ void incrementHopTTL(hop_t *hop) {
 }
 
 int initHop(hop_t *hop, struct addrinfo *addr, u_int16_t packetNumber) {
+    struct timeval timeout;
+    
     ft_bzero(hop, sizeof(hop_t));
     hop->packetNumber = packetNumber;
     hop->addr = addr;
     hop->ttl = 0;
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 50000;
     for(u_int16_t n = 0; n < packetNumber; n++) {
         fill_IP_Header(&hop->packets[n].send.iphdr, (uint32_t)((struct sockaddr_in*)addr->ai_addr)->sin_addr.s_addr, hop->ttl);
-            if (!(hop->sockIds[n] = create_socket(1)))
+            if (!(hop->sockIds[n] = create_socket(timeout)))
 		        return 0;
     }
     return 1;
@@ -56,16 +57,35 @@ int initHop(hop_t *hop, struct addrinfo *addr, u_int16_t packetNumber) {
 
 void sendHopPackets(hop_t *hop) {
     for(u_int16_t sequence = 0; sequence < hop->packetNumber; sequence++) {
-        fill_ICMP_Header(&hop->packets[0].send, ++sequence);
-        gettimeofday(&hop->packets[0].start, 0);
-        sendto(hop->sockIds[0], &hop->packets[0].send, sizeof(struct packet), 0, (struct sockaddr*)hop->addr->ai_addr, sizeof(*hop->addr->ai_addr));
+        fill_ICMP_Header(&hop->packets[sequence].send, sequence);
+        gettimeofday(&hop->packets[sequence].start, 0);
+        sendto(hop->sockIds[0], &hop->packets[sequence].send, sizeof(struct packet), 0, (struct sockaddr*)hop->addr->ai_addr, sizeof(*hop->addr->ai_addr));
     }
 }
 
-void revieveHopPackets(hop_t *hop) {
-    for(u_int16_t sequence = 0; sequence < hop->packetNumber; sequence++) { //maybe need to copy the packet into its right index
+void recieveHopPackets(hop_t *hop) {
+    /*struct timeval timeout;
+    int ret = 0;
+    fd_set fds;*/
+    
+
+    /*for (unsigned n = 0; n < hop->packetNumber; n++) {
+        FD_ZERO(&fds[n]);
+        FD_SET(hop->sockIds[n], &fds[n]);
+    }*/
+    
+    /*while (ret < hop->packetNumber) {
+        timeout.tv_sec = 1;
+        timeout.tv_usec = 0;
+        FD_ZERO(&fds);
+        for (unsigned n = 0; n < hop->packetNumber; n++)
+            FD_SET(hop->sockIds[n], &fds);
+        ret = select(hop->sockIds[hop->packetNumber - 1] + 1, &fds, 0, 0, &timeout);
+    }*/
+
+    for(u_int16_t sequence = 0; sequence < hop->packetNumber; sequence++) {
         ft_bzero(&hop->packets[sequence].recieved, sizeof(struct packet));
-        recvfrom(hop->sockIds[0], &hop->packets[sequence].recieved, sizeof(struct packet), 0, INADDR_ANY, 0);
+        hop->packets[sequence].error = recvfrom(hop->sockIds[0], &hop->packets[sequence].recieved, sizeof(struct packet), 0, INADDR_ANY, 0) < 0;
         gettimeofday(&hop->packets[sequence].end, 0);
     }
 }
@@ -75,25 +95,17 @@ void freeHop(hop_t *hop) {
         close(hop->sockIds[0]);
 }
 
-void printHop(hop_t *hop) {
-    printf("\r %d ", hop->ttl);
-    float delatTime = getTimeInterval(hop->packets[0].start, hop->packets[0].end);
-    printPacket(&hop->packets[0].recieved, delatTime);
-    printf("\n");
-}
-
 int loop(struct addrinfo *addr) {
     hop_t   hop;
     u_int32_t finalAddr;
 
-    if (!initHop(&hop, addr, 1))
+    if (!initHop(&hop, addr, 3))
         return 0;
     finalAddr = (uint32_t)((struct sockaddr_in*)addr->ai_addr)->sin_addr.s_addr;
-    while (traceroute_runnig && hop.ttl <= MAX_HOP && finalAddr != hop.packets->recieved.iphdr.saddr)
-    {
+    while (traceroute_runnig && hop.ttl <= MAX_HOP && finalAddr != hop.packets->recieved.iphdr.saddr) {
         incrementHopTTL(&hop);
         sendHopPackets(&hop);
-        revieveHopPackets(&hop);
+        recieveHopPackets(&hop);
         printHop(&hop);
     }
     freeHop(&hop);
@@ -157,7 +169,7 @@ int main(int ac, char **av) {
         return 1;
     }
 
-    signal(SIGINT, &stop_loop);
+ //   signal(SIGINT, &stop_loop);
     if (!(addrinfo = getAddrInfo(option.addr)))
         return 1;
     printAddrInfo(addrinfo);
