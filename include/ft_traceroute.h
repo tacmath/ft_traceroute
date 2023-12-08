@@ -68,7 +68,7 @@ void printUsage();
 
 // header.c
 //void fill_ICMP_Header(struct packet *pkt, u_int16_t sequence);
-void fill_UDP_Header(struct packet *pkt);
+void fill_UDP_Header(struct packet *pktm, int port);
 void fill_IP_Header(struct iphdr *header, uint32_t daddr, u_int8_t ttl);
 
 

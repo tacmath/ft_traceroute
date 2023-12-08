@@ -12,7 +12,7 @@ int create_socket(struct timeval timeout) {
     int option;
 
 
-    if ((sockId = socket(PF_INET, SOCK_RAW, IPPROTO_UDP)) < 0) {
+    if ((sockId = socket(PF_INET, SOCK_RAW, IPPROTO_ICMP)) < 0) {
         dprintf(2, "ft_traceroute: Socket creation failed\n");
         return 0;
     }
@@ -57,35 +57,36 @@ int initHop(hop_t *hop, struct addrinfo *addr, u_int16_t packetNumber) {
 
 void sendHopPackets(hop_t *hop) {
     for(u_int16_t sequence = 0; sequence < hop->packetNumber; sequence++) {
-        fill_UDP_Header(&hop->packets[sequence].send);
+        fill_UDP_Header(&hop->packets[sequence].send, 33434 + sequence);
         gettimeofday(&hop->packets[sequence].start, 0);
-        sendto(hop->sockIds[0], &hop->packets[sequence].send, sizeof(struct packet), 0, (struct sockaddr*)hop->addr->ai_addr, sizeof(*hop->addr->ai_addr));
+        sendto(hop->sockIds[sequence], &hop->packets[sequence].send, sizeof(struct packet), 0, (struct sockaddr*)hop->addr->ai_addr, sizeof(*hop->addr->ai_addr));
     }
 }
 
 void recieveHopPackets(hop_t *hop) {
-    /*struct timeval timeout;
-    int ret = 0;
-    fd_set fds;*/
+   // struct timeval timeout;
+   // int ret = 0;
+   // fd_set fds;
     
 
     /*for (unsigned n = 0; n < hop->packetNumber; n++) {
         FD_ZERO(&fds[n]);
         FD_SET(hop->sockIds[n], &fds[n]);
     }*/
-    
-    /*while (ret < hop->packetNumber) {
+   /* 
+    while (ret < hop->packetNumber) {
         timeout.tv_sec = 1;
         timeout.tv_usec = 0;
         FD_ZERO(&fds);
         for (unsigned n = 0; n < hop->packetNumber; n++)
             FD_SET(hop->sockIds[n], &fds);
         ret = select(hop->sockIds[hop->packetNumber - 1] + 1, &fds, 0, 0, &timeout);
-    }*/
-
+        FD_ISSET(hop->sockIds[n], &fds);
+    }
+*/
     for(u_int16_t sequence = 0; sequence < hop->packetNumber; sequence++) {
         ft_bzero(&hop->packets[sequence].recieved, sizeof(struct packet));
-        hop->packets[sequence].error = recvfrom(hop->sockIds[0], &hop->packets[sequence].recieved, sizeof(struct packet), 0, INADDR_ANY, 0) < 0;
+        hop->packets[sequence].error = recvfrom(hop->sockIds[sequence], &hop->packets[sequence].recieved, sizeof(struct packet), 0, INADDR_ANY, 0) < 0;
         gettimeofday(&hop->packets[sequence].end, 0);
     }
 }
