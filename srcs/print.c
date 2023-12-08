@@ -1,13 +1,13 @@
 #include "ft_traceroute.h"
 
-void printAddrInfo(struct addrinfo *info) {
+void printAddrInfo(struct addrinfo *info, u_int8_t maxHop) {
     char ipbuff[INET_ADDRSTRLEN];
     struct sockaddr_in *sockaddr;
 
     sockaddr = (struct sockaddr_in*)info->ai_addr;
     inet_ntop(AF_INET, &sockaddr->sin_addr, ipbuff, sizeof(ipbuff));
 
-    printf("ft_traceroute to %s (%s), %d hops max, %d byte packets\n", info->ai_canonname, ipbuff, MAX_HOP,PACKET_SIZE);
+    printf("ft_traceroute to %s (%s), %d hops max, %d byte packets\n", info->ai_canonname, ipbuff, maxHop,PACKET_SIZE);
 }
 
 static void printPacket(struct packet *packet, float delatTime) {

@@ -17,7 +17,8 @@
 
 #define PACKET_SIZE 60
 #define MAX_PACKET_PER_HOP 10
-#define MAX_HOP 30
+#define DEFAULT_MAX_HOP 30
+#define DEFAULT_STARTING_PORT 33434
 
 struct packet {
 	struct iphdr	iphdr;
@@ -36,9 +37,11 @@ struct packet_info {
 
 struct hop {
 	struct packet_info	packets[MAX_PACKET_PER_HOP];
-	int					sockIds[MAX_PACKET_PER_HOP];
 	u_int16_t			packetNumber;
+	int					sockId;
 	struct addrinfo		*addr;
+	uint16_t			port;
+	uint8_t				isICMP;
 	uint8_t				ttl;
 
 };
@@ -47,6 +50,11 @@ typedef struct hop hop_t;
 
 struct option {
     char        *addr;
+	uint8_t nbPacket;
+	uint8_t maxHop;
+	uint8_t ttl;
+	uint16_t port;
+	uint8_t isICMP;
     uint8_t help;
 };
 
@@ -60,14 +68,14 @@ float getTimeInterval(struct timeval t1, struct timeval t2);
 int	ft_atoi(const char *str);
 struct addrinfo *getAddrInfo(char *addr);
 char* strIcmpType(uint8_t type);
+char ft_strcmp(char *str1, char *str2);
 
 // print.c
-void printAddrInfo(struct addrinfo *info);
+void printAddrInfo(struct addrinfo *info, u_int8_t maxHop);
 void printHop(hop_t *hop);
 void printUsage();
 
 // header.c
-//void fill_ICMP_Header(struct packet *pkt, u_int16_t sequence);
 void fill_UDP_Header(struct packet *pktm, int port);
 void fill_IP_Header(struct iphdr *header, uint32_t daddr, u_int8_t ttl);
 
