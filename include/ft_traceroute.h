@@ -22,8 +22,18 @@
 
 struct packet {
 	struct iphdr	iphdr;
-	struct udphdr	udphdr;
-	char payload[PACKET_SIZE - sizeof(struct udphdr)];
+	union {
+		struct
+		{
+			struct udphdr	hdr;
+			char payload[PACKET_SIZE - sizeof(struct udphdr)];
+		} udp;
+		struct
+		{
+			struct icmphdr	hdr;
+			char payload[PACKET_SIZE - sizeof(struct icmphdr)];
+		} icmp;
+	};
 };
 
 struct packet_info {
@@ -41,7 +51,6 @@ struct hop {
 	int					sockId;
 	struct addrinfo		*addr;
 	uint16_t			port;
-	uint8_t				isICMP;
 	uint8_t				ttl;
 
 };
@@ -76,8 +85,12 @@ void printHop(hop_t *hop);
 void printUsage();
 
 // header.c
-void fill_UDP_Header(struct packet *pktm, int port);
-void fill_IP_Header(struct iphdr *header, uint32_t daddr, u_int8_t ttl);
+void fill_ICMP_Header(struct packet *pkt, u_int16_t sequence);
+void fill_UDP_Header(struct udphdr *udphdr, int port);
+void fill_IP_Header(struct iphdr *header, uint32_t daddr, u_int8_t ttl, u_int8_t protocol);
+
+//option.c
+void getOption(option_t *option, int ac, char **av);
 
 
 #endif

@@ -52,4 +52,9 @@ void printUsage() {
     printf("\nUsage\n  ft_traceroute [options] <destination>\n\nOptions:");
     printf("  <destination>     dns name or ip address\n");
     printf("  --help            print usage\n");
+    printf("  -f<first_ttl>     Start from the first_ttl hop (instead from 1)\n");
+    printf("  -I  --icmp        Use ICMP ECHO for tracerouting\n");
+    printf("  -m<max_ttl>       Set the max number of hops (max TTL to be reached). Default is 30\n");
+    printf("  -p<port>          Set the destination port to use for UDP. Default is 33434\n");
+    printf("  -q<nqueries>      Set the number of probes per each hop. Default is 3\n");
 }

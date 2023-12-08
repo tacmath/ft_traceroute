@@ -5,6 +5,7 @@ SRCFILES = main.c\
 			header.c\
 			print.c\
 			utils.c\
+			option.c\
 
 INCFILES = ft_traceroute.h
 SRC = $(addprefix $(SRCDIR),$(SRCFILES))
