@@ -10,6 +10,7 @@
 #include <sys/time.h>
 #include <netinet/ip.h>
 #include <netinet/ip_icmp.h>
+#include <netinet/udp.h>
 #include <signal.h>
 #include <arpa/inet.h>
 #include <stdlib.h>
@@ -20,8 +21,8 @@
 
 struct packet {
 	struct iphdr	iphdr;
-	struct icmphdr	icmphdr;
-	char payload[PACKET_SIZE - sizeof(struct icmphdr)];
+	struct udphdr	udphdr;
+	char payload[PACKET_SIZE - sizeof(struct udphdr)];
 };
 
 struct packet_info {
@@ -66,7 +67,8 @@ void printHop(hop_t *hop);
 void printUsage();
 
 // header.c
-void fill_ICMP_Header(struct packet *pkt, u_int16_t sequence);
+//void fill_ICMP_Header(struct packet *pkt, u_int16_t sequence);
+void fill_UDP_Header(struct packet *pkt);
 void fill_IP_Header(struct iphdr *header, uint32_t daddr, u_int8_t ttl);
 
 
