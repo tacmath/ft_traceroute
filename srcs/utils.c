@@ -26,6 +26,17 @@ float getTimeInterval(struct timeval t1, struct timeval t2) { //in ms
     return (t2.tv_sec - t1.tv_sec) * 1000.0f + (t2.tv_usec - t1.tv_usec) * 0.001f;
 }
 
+char ft_strcmp(char *str1, char *str2) {
+    unsigned int n;
+
+    if (!str1 || !str2)
+        return (str1 != str2);
+    n = 0;
+    while(str1[n] == str2[n] && str1[n])
+        n++;
+    return str1[n] - str2[n];
+}
+
 int	ft_atoi(const char *str)
 {
 	int negatif;

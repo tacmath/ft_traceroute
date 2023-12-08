@@ -1,13 +1,13 @@
 #include "ft_traceroute.h"
 
-void printAddrInfo(struct addrinfo *info) {
+void printAddrInfo(struct addrinfo *info, u_int8_t maxHop) {
     char ipbuff[INET_ADDRSTRLEN];
     struct sockaddr_in *sockaddr;
 
     sockaddr = (struct sockaddr_in*)info->ai_addr;
     inet_ntop(AF_INET, &sockaddr->sin_addr, ipbuff, sizeof(ipbuff));
 
-    printf("ft_traceroute to %s (%s), %d hops max, %d byte packets\n", info->ai_canonname, ipbuff, MAX_HOP,PACKET_SIZE);
+    printf("ft_traceroute to %s (%s), %d hops max, %d byte packets\n", info->ai_canonname, ipbuff, maxHop,PACKET_SIZE);
 }
 
 static void printPacket(struct packet *packet, float delatTime) {
@@ -52,4 +52,9 @@ void printUsage() {
     printf("\nUsage\n  ft_traceroute [options] <destination>\n\nOptions:");
     printf("  <destination>     dns name or ip address\n");
     printf("  --help            print usage\n");
+    printf("  -f<first_ttl>     Start from the first_ttl hop (instead from 1)\n");
+    printf("  -I  --icmp        Use ICMP ECHO for tracerouting\n");
+    printf("  -m<max_ttl>       Set the max number of hops (max TTL to be reached). Default is 30\n");
+    printf("  -p<port>          Set the destination port to use for UDP. Default is 33434\n");
+    printf("  -q<nqueries>      Set the number of probes per each hop. Default is 3\n");
 }
