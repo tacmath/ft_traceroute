@@ -54,8 +54,8 @@ void printHop(hop_t *hop) {
 
 void printUsage() {
     printf("\nUsage\n  ft_traceroute [options] <destination>\n\nOptions:");
-    printf("  <destination>     dns name or ip address\n");
-    printf("  -h  --help        print usage\n");
+    printf("  <destination>     DNS name or ip address\n");
+    printf("  -h  --help        Print usage\n");
     printf("  -f<first_ttl>     Start from the first_ttl hop (instead from 1)\n");
     printf("  -I  --icmp        Use ICMP ECHO for tracerouting\n");
     printf("  -m<max_ttl>       Set the max number of hops (max TTL to be reached). Default is 30\n");

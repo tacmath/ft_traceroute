@@ -9,7 +9,7 @@ static void fillDefaultOption(option_t *option) {
 
 static int limitOption(int value, int min, int max, int def, char *optionName) {
     if (value < min || value > max) {
-        dprintf(2, "L'option %s dois avoir une valeur entre %d et %d valeur par defaut utiliser\n", optionName, min, max);
+        dprintf(2, "\e[41mThe option %s must have a value between %d and %d. Default value used %d\e[0m\n", optionName, min, max, def);
         return def;
     }
     return value;

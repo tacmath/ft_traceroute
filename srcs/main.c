@@ -50,7 +50,7 @@ int initHop(hop_t *hop, struct addrinfo *addr, option_t *option) {
         fill_IP_Header(&hop->packets[n].send.iphdr, (uint32_t)((struct sockaddr_in*)addr->ai_addr)->sin_addr.s_addr, hop->ttl, 
            option->isICMP ? IPPROTO_ICMP : IPPROTO_UDP);
     timeout.tv_sec = 0;
-    timeout.tv_usec = 100000;
+    timeout.tv_usec = 200000;
     if (!(hop->sockId = create_socket(timeout)))
 		return 0;
     return 1;
@@ -103,20 +103,15 @@ int main(int ac, char **av) {
     getOption(&option, ac, av);
     if (!option.addr) {
         dprintf(2, "Specify \"host\" missing argument.\n");
-        return 1;
-    }
-
-    if (getuid() != 0) {
-		dprintf(2, "ft_traceroute: Operation not permitted\n");
-        return 1;
+        return 2;
     }
 
     signal(SIGINT, &stop_loop);
     if (!(addrinfo = getAddrInfo(option.addr)))
-        return 1;
+        return 2;
     printAddrInfo(addrinfo, option.maxHop);
     if (!loop(addrinfo, &option))
-        return 1;
+        return 2;
     freeaddrinfo(addrinfo);
-    return 0;
+    return (traceroute_runnig) ? 0 : 130;
 }

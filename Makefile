@@ -20,6 +20,7 @@ all: $(NAME)
 
 $(NAME): $(OBJ) $(INC)
 	gcc -o $@ $(OBJ) $(FLAG)
+	@sudo setcap cap_net_raw=pe $(NAME)
 
 clean:
 	rm -f $(OBJ)
