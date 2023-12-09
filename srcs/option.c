@@ -25,11 +25,10 @@ void getOption(option_t *option, int ac, char **av) {
                 case 'f': option->ttl = limitOption(ft_atoi(&av[n][2]), 1, UINT8_MAX, 1, "f") - 1; break;
                 case 'p': option->port = limitOption(ft_atoi(&av[n][2]), 1, UINT16_MAX - MAX_PACKET_PER_HOP, DEFAULT_STARTING_PORT, "p") - 1; break;
                 case 'I': option->isICMP = 1; break;
+                case 'h': option->help = 1; break;
                 default: 
-                    if (!ft_strcmp(av[n], "--help")) {
-                        printUsage();
-                        exit(0);
-                    }
+                    if (!ft_strcmp(av[n], "--help"))
+                        option->help = 1;
                     if (!ft_strcmp(av[n], "--icmp"))
                         option->isICMP = 1;
                     break;
@@ -37,5 +36,9 @@ void getOption(option_t *option, int ac, char **av) {
         }
         else
             option->addr = av[n];
+    }
+    if (option->help) {
+        printUsage();
+        exit(0);
     }
 }

@@ -1,5 +1,7 @@
 #include "ft_traceroute.h"
 
+extern int traceroute_runnig;
+
 void printAddrInfo(struct addrinfo *info, u_int8_t maxHop) {
     char ipbuff[INET_ADDRSTRLEN];
     struct sockaddr_in *sockaddr;
@@ -34,6 +36,8 @@ static int hasUniqueAddr(hop_t *hop, unsigned packetIndex) {
 void printHop(hop_t *hop) {
     float delatTime;
 
+    if (!traceroute_runnig)
+        return;
     printf("\r %d ", hop->ttl);
     for (unsigned n = 0; n < hop->packetNumber; n++) {
         delatTime = getTimeInterval(hop->packets[n].start, hop->packets[n].end);
@@ -42,7 +46,7 @@ void printHop(hop_t *hop) {
         else if (hasUniqueAddr(hop, n))
             printPacket(&hop->packets[n].recieved, delatTime);
         else
-            printf(" %.3f ms", delatTime);
+            printf("  %.3f ms", delatTime);
     }
     printf("\n");
 }
@@ -51,7 +55,7 @@ void printHop(hop_t *hop) {
 void printUsage() {
     printf("\nUsage\n  ft_traceroute [options] <destination>\n\nOptions:");
     printf("  <destination>     dns name or ip address\n");
-    printf("  --help            print usage\n");
+    printf("  -h  --help        print usage\n");
     printf("  -f<first_ttl>     Start from the first_ttl hop (instead from 1)\n");
     printf("  -I  --icmp        Use ICMP ECHO for tracerouting\n");
     printf("  -m<max_ttl>       Set the max number of hops (max TTL to be reached). Default is 30\n");

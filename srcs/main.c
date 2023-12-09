@@ -57,7 +57,7 @@ int initHop(hop_t *hop, struct addrinfo *addr, option_t *option) {
 }
 
 void sendHopPackets(hop_t *hop) {
-    for(u_int16_t sequence = 0; sequence < hop->packetNumber; sequence++) {
+    for(u_int16_t sequence = 0; sequence < hop->packetNumber && traceroute_runnig; sequence++) {
         ft_bzero(&hop->packets[sequence].recieved, sizeof(struct packet));
         if (hop->packets[sequence].send.iphdr.protocol == IPPROTO_UDP)
             fill_UDP_Header(&hop->packets[sequence].send.udp.hdr, hop->port + sequence);
