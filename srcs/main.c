@@ -103,15 +103,15 @@ int main(int ac, char **av) {
     getOption(&option, ac, av);
     if (!option.addr) {
         dprintf(2, "Specify \"host\" missing argument.\n");
-        return 2;
+        return 1;
     }
 
     signal(SIGINT, &stop_loop);
     if (!(addrinfo = getAddrInfo(option.addr)))
-        return 2;
+        return 1;
     printAddrInfo(addrinfo, option.maxHop);
     if (!loop(addrinfo, &option))
-        return 2;
+        return 1;
     freeaddrinfo(addrinfo);
-    return (traceroute_runnig) ? 0 : 130;
+    return 0;
 }
